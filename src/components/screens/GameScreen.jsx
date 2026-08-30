@@ -8,11 +8,11 @@ export default function GameScreen({ game, roomCode, myPlayerId, onAction, onRes
   const me = game.players.find((player) => player.id === myPlayerId);
 
   return (
-    <main className="app">
-      <header className="topbar">
+    <main className="app app--game">
+      <header className="topbar topbar--game">
         <div>
-          <span className="eyebrow">BIG SHOT ONLINE · protótipo 0.11</span>
-          <h1>Mesa digital</h1>
+          <span className="eyebrow">BIG SHOT ONLINE · protótipo 0.12</span>
+          <h1>Big Shot - um jogo de Alex Randolph</h1>
         </div>
         <div className="topbar-meta">
           {me && <span className="you-are">Você: <b>{me.name}</b></span>}
@@ -23,14 +23,24 @@ export default function GameScreen({ game, roomCode, myPlayerId, onAction, onRes
         </div>
       </header>
 
-      <PlayerBar players={game.players} activePlayerId={activePlayerId} activeLabel={activeLabel} />
-      <Board
-        game={game}
-        myPlayerId={myPlayerId}
-        onAction={onAction}
-        onReset={onReset}
-        connectionLabel={connectionLabel}
-      />
+      <div className="game-layout">
+        <aside className="players-sidebar" aria-label="Jogadores">
+          <PlayerBar
+            players={game.players}
+            activePlayerId={activePlayerId}
+            activeLabel={activeLabel}
+            layout="vertical"
+          />
+        </aside>
+
+        <Board
+          game={game}
+          myPlayerId={myPlayerId}
+          onAction={onAction}
+          onReset={onReset}
+          connectionLabel={connectionLabel}
+        />
+      </div>
     </main>
   );
 }

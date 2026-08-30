@@ -1,8 +1,8 @@
 import Cube from './Cube.jsx';
 
-export default function PlayerBar({ players, activePlayerId, activeLabel = 'vez atual' }) {
+export default function PlayerBar({ players, activePlayerId, activeLabel = 'vez atual', layout = 'horizontal' }) {
   return (
-    <section className="players" aria-label="Jogadores">
+    <section className={`players players--${layout}`} aria-label="Jogadores">
       {players.map((player, index) => {
         const active = player.id === activePlayerId;
         return (
