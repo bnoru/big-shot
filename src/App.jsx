@@ -8,6 +8,7 @@ import {
   loadRoom,
   loadRoomByCode,
   saveGameState,
+  setPlayerColor,
   startRoom,
   subscribeToPresence,
   subscribeToRoom,
@@ -40,6 +41,8 @@ function readableError(error) {
   if (message.includes('only_host')) return 'Somente o anfitrião pode iniciar a partida.';
   if (message.includes('need_four_players')) return 'São necessários quatro jogadores para começar.';
   if (message.includes('revision_conflict')) return 'Outro jogador agiu ao mesmo tempo. O estado foi atualizado; tente novamente.';
+  if (message.includes('invalid_color')) return 'Cor inválida.';
+  if (message.includes('player_not_found')) return 'Jogador não encontrado nesta mesa.';
   return message;
 }
 
@@ -202,6 +205,20 @@ function OnlineApp() {
     }
   }
 
+  async function handleSetColor(playerUserId, color) {
+    if (!roomBundle?.room) return;
+    try {
+      setBusy(true);
+      setError('');
+      await setPlayerColor(roomBundle.room.id, playerUserId, color);
+      await refreshRoom(roomBundle.room.id);
+    } catch (colorError) {
+      setError(readableError(colorError));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleStart() {
     if (!roomBundle?.room) return;
     try {
@@ -299,6 +316,7 @@ function OnlineApp() {
         currentUserId={user.id}
         onlineUserIds={onlineUserIds}
         onStart={handleStart}
+        onSetColor={handleSetColor}
         onCopyLink={copyInvite}
         busy={busy}
         error={error}

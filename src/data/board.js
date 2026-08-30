@@ -2,7 +2,7 @@ export const players = [
   { id: 'red', name: 'Bruno', money: 10, loans: 0 },
   { id: 'blue', name: 'Jogador 2', money: 10, loans: 0 },
   { id: 'gold', name: 'Jogador 3', money: 10, loans: 0 },
-  { id: 'ivory', name: 'Jogador 4', money: 10, loans: 0 },
+  { id: 'green', name: 'Jogador 4', money: 10, loans: 0 },
 ];
 
 // The numbers are internal IDs only. They are intentionally not rendered on the board.

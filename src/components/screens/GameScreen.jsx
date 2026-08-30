@@ -11,7 +11,7 @@ export default function GameScreen({ game, roomCode, myPlayerId, onAction, onRes
     <main className="app">
       <header className="topbar">
         <div>
-          <span className="eyebrow">BIG SHOT ONLINE · protótipo 0.8</span>
+          <span className="eyebrow">BIG SHOT ONLINE · protótipo 0.11</span>
           <h1>Mesa digital</h1>
         </div>
         <div className="topbar-meta">

@@ -91,7 +91,7 @@ h1 {
 .cube--red { background: #b84f45; }
 .cube--blue { background: #405f78; }
 .cube--gold { background: #d2a93a; }
-.cube--ivory { background: #e9e2cd; }
+.cube--green { background: #4f7f59; }
 
 .board-shell {
   display: grid;
@@ -618,7 +618,7 @@ h1 {
 .lot-cube-svg--red { fill: #b84f45; }
 .lot-cube-svg--blue { fill: #405f78; }
 .lot-cube-svg--gold { fill: #d2a93a; }
-.lot-cube-svg--ivory { fill: #e9e2cd; }
+.lot-cube-svg--green { fill: #4f7f59; }
 
 .lot-sold-token {
   fill: #eee6d6;
@@ -915,6 +915,14 @@ h1 {
 .lobby-seat span, .lobby-seat strong { display: block; }
 .lobby-seat div > span { color: #737b7f; font-size: 8px; letter-spacing: .08em; text-transform: uppercase; }
 .lobby-seat strong { margin-top: 3px; overflow: hidden; color: #ece6db; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.lobby-seat__main { min-width: 0; }
+.lobby-empty-cube { width: 16px; height: 16px; border: 1px dashed #545c60; background: #101416; }
+.lobby-color-control { display: flex; align-items: center; gap: 7px; margin-top: 8px; }
+.lobby-color-control > span { color: #737b7f; font-size: 8px; letter-spacing: .08em; text-transform: uppercase; }
+.lobby-color-control select { min-width: 105px; border: 1px solid #454b4e; padding: 5px 24px 5px 7px; color: #d9d4c9; background: #101416; font: 600 9px/1.2 system-ui, sans-serif; cursor: pointer; }
+.lobby-color-control select:focus { border-color: #9a875f; outline: none; }
+.lobby-color-control select:disabled { cursor: default; opacity: .55; }
+.lobby-color-label { margin-top: 6px; color: #9aa1a4 !important; font-size: 9px !important; letter-spacing: 0 !important; text-transform: none !important; }
 .presence-dot { width: 7px; height: 7px; border-radius: 50%; background: #555d60; }
 .presence-dot--online { background: #8ba46d; box-shadow: 0 0 0 3px rgba(139,164,109,.08); }
 .lobby-status { display: flex; align-items: baseline; gap: 8px; margin-top: 22px; color: #858d91; }

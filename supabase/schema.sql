@@ -1,4 +1,4 @@
--- Big Shot Online 0.9 — Supabase schema
+-- Big Shot Online 0.11 — Supabase schema
 -- Run this file in Supabase > SQL Editor.
 -- Then enable Authentication > Providers > Anonymous Sign-Ins.
 
@@ -17,11 +17,11 @@ create table if not exists public.room_players (
   user_id uuid not null references auth.users(id) on delete cascade,
   name text not null check (char_length(name) between 1 and 28),
   seat integer not null check (seat between 0 and 3),
-  color text not null check (color in ('red', 'blue', 'gold', 'ivory')),
+  color text not null check (color in ('red', 'blue', 'gold', 'green')),
   joined_at timestamptz not null default now(),
   primary key (room_id, user_id),
   unique (room_id, seat),
-  unique (room_id, color)
+  constraint room_players_room_id_color_key unique (room_id, color) deferrable initially immediate
 );
 
 create table if not exists public.game_states (
@@ -136,16 +136,17 @@ begin
   if v_user is null then raise exception 'not_authenticated'; end if;
   if char_length(v_name) < 1 or char_length(v_name) > 28 then raise exception 'invalid_name'; end if;
 
-  select * into v_room
-  from public.rooms
-  where code = upper(trim(p_code))
+  select r.* into v_room
+  from public.rooms r
+  where r.code = upper(trim(p_code))
   for update;
 
   if not found then raise exception 'room_not_found'; end if;
 
-  select * into v_existing
-  from public.room_players
-  where room_id = v_room.id and user_id = v_user;
+  select rp.* into v_existing
+  from public.room_players rp
+  where rp.room_id = v_room.id
+    and rp.user_id = v_user;
 
   if found then
     return query select v_room.id, v_room.code, v_existing.seat, v_existing.color;
@@ -165,7 +166,7 @@ begin
 
   if v_seat is null then raise exception 'room_full'; end if;
 
-  v_color := (array['red', 'blue', 'gold', 'ivory'])[v_seat + 1];
+  v_color := (array['red', 'blue', 'gold', 'green'])[v_seat + 1];
 
   insert into public.room_players (room_id, user_id, name, seat, color)
   values (v_room.id, v_user, v_name, v_seat, v_color);
@@ -247,15 +248,78 @@ begin
 end;
 $$;
 
+create or replace function public.set_player_color(
+  p_room_id uuid,
+  p_player_user_id uuid,
+  p_color text
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user uuid := auth.uid();
+  v_room public.rooms%rowtype;
+  v_old_color text;
+  v_other_user uuid;
+begin
+  if v_user is null then raise exception 'not_authenticated'; end if;
+  if p_color not in ('red', 'blue', 'gold', 'green') then raise exception 'invalid_color'; end if;
+
+  select r.* into v_room
+  from public.rooms r
+  where r.id = p_room_id
+  for update;
+
+  if not found then raise exception 'room_not_found'; end if;
+  if v_room.host_user_id <> v_user then raise exception 'only_host'; end if;
+  if v_room.status <> 'lobby' then raise exception 'room_already_started'; end if;
+
+  select rp.color into v_old_color
+  from public.room_players rp
+  where rp.room_id = p_room_id
+    and rp.user_id = p_player_user_id;
+
+  if not found then raise exception 'player_not_found'; end if;
+  if v_old_color = p_color then return; end if;
+
+  select rp.user_id into v_other_user
+  from public.room_players rp
+  where rp.room_id = p_room_id
+    and rp.color = p_color;
+
+  set constraints room_players_room_id_color_key deferred;
+
+  if v_other_user is null then
+    update public.room_players rp
+    set color = p_color
+    where rp.room_id = p_room_id
+      and rp.user_id = p_player_user_id;
+  else
+    update public.room_players rp
+    set color = case
+      when rp.user_id = p_player_user_id then p_color
+      when rp.user_id = v_other_user then v_old_color
+      else rp.color
+    end
+    where rp.room_id = p_room_id
+      and rp.user_id in (p_player_user_id, v_other_user);
+  end if;
+end;
+$$;
+
 revoke all on function public.create_room(text) from public;
 revoke all on function public.join_room(text, text) from public;
 revoke all on function public.start_room(uuid, jsonb) from public;
 revoke all on function public.update_game_state(uuid, bigint, jsonb) from public;
+revoke all on function public.set_player_color(uuid, uuid, text) from public;
 
 grant execute on function public.create_room(text) to authenticated;
 grant execute on function public.join_room(text, text) to authenticated;
 grant execute on function public.start_room(uuid, jsonb) to authenticated;
 grant execute on function public.update_game_state(uuid, bigint, jsonb) to authenticated;
+grant execute on function public.set_player_color(uuid, uuid, text) to authenticated;
 
 -- Add the three tables to Supabase Realtime, but keep this script safe to rerun.
 do $$

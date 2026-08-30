@@ -72,6 +72,15 @@ export async function loadRoom(roomId, roomRow = null) {
   };
 }
 
+export async function setPlayerColor(roomId, playerUserId, color) {
+  const { error } = await supabase.rpc('set_player_color', {
+    p_room_id: roomId,
+    p_player_user_id: playerUserId,
+    p_color: color,
+  });
+  if (error) throw error;
+}
+
 export async function startRoom(roomId, initialState) {
   const { data, error } = await supabase.rpc('start_room', {
     p_room_id: roomId,

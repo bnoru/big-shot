@@ -1,5 +1,7 @@
 # Big Shot Online
 
+Versão 0.11: cor verde no lugar do marfim e seleção de cores pelo anfitrião no lobby.
+
 Protótipo web multiplayer inspirado em Big Shot, preparado para GitHub Pages + Supabase.
 
 ## Estado atual — v0.10

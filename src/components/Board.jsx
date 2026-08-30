@@ -12,7 +12,7 @@ const COLOR_NAMES = {
   red: 'vermelho',
   blue: 'azul',
   gold: 'amarelo',
-  ivory: 'marfim',
+  green: 'verde',
 };
 
 export default function Board({ game, myPlayerId, onAction, onReset = null, connectionLabel = null }) {
